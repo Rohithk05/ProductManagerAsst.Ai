@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📋 PM Assistant - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0a2e 0%, #16213e 50%, #0f3460 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .login-card {
+            background: rgba(10, 10, 46, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #8b5cf6 0%, #d946ef 50%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);
+        }
+
+        input {
+            background: rgba(30, 27, 75, 0.6) !important;
+            border: 1px solid rgba(139, 92, 246, 0.3) !important;
+            color: #fff !important;
+        }
+
+        input:focus {
+            background: rgba(30, 27, 75, 0.9) !important;
+            border: 1px solid rgba(139, 92, 246, 0.6) !important;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+        }
+    </style>
+</head>
+<body class="text-gray-100">
+    <div class="login-container">
+        <div class="login-card">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-4xl mb-2">📋</h1>
+                <h2 class="text-3xl font-bold gradient-text mb-2">PM Assistant</h2>
+                <p class="text-gray-400">PRD Generator & API Documentation</p>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">
+                        <i class="fas fa-envelope mr-2"></i> Email
+                    </label>
+                    <input 
+                        type="email" 
+                        id="email"
+                        class="w-full px-4 py-3 rounded-lg text-sm focus:outline-none"
+                        placeholder="your@email.com"
+                        required
+                    >
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-300 mb-2">
+                        <i class="fas fa-lock mr-2"></i> Password
+                    </label>
+                    <input 
+                        type="password" 
+                        id="password"
+                        class="w-full px-4 py-3 rounded-lg text-sm focus:outline-none"
+                        placeholder="••••••••"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="w-full btn-login text-white font-bold py-3 px-6 rounded-lg text-lg mb-4 transition-all">
+                    <i class="fas fa-sign-in-alt mr-2"></i> Sign In
+                </button>
+            </form>
+
+            <!-- Demo Info -->
+            <div class="p-4 bg-purple-500/10 rounded-lg border border-purple-500/20 text-center">
+                <p class="text-sm text-gray-400 mb-2">
+                    <i class="fas fa-info-circle mr-2 text-purple-400"></i>
+                    <strong>Demo Login</strong>
+                </p>
+                <p class="text-xs text-gray-400">
+                    Email: <span class="text-purple-400 font-mono">demo@pm.com</span>
+                </p>
+                <p class="text-xs text-gray-400">
+                    Password: <span class="text-purple-400 font-mono">password123</span>
+                </p>
+            </div>
+
+            <!-- Footer -->
+            <p class="text-center text-gray-500 text-xs mt-6">
+                Powered by Groq + Llama 3.3
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (email && password) {
+                localStorage.setItem('user', JSON.stringify({
+                    email: email,
+                    loginTime: new Date().toISOString()
+                }));
+                localStorage.setItem('isLoggedIn', 'true');
+                window.location.href = '/app';
+            } else {
+                alert('❌ Please fill in all fields');
+            }
+        }
+
+        // If already logged in, go to app
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            window.location.href = '/app';
+        }
+    </script>
+</body>
+</html>

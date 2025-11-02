@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📋 PM Assistant & API Doc Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        * {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            background-attachment: fixed;
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.15);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #8b5cf6 0%, #d946ef 50%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        .stat-badge {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(217, 70, 239, 0.15) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        textarea, input, select {
+            background: rgba(30, 27, 75, 0.6) !important;
+            border: 1px solid rgba(139, 92, 246, 0.2) !important;
+            color: #e2e8f0 !important;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus, input:focus, select:focus {
+            background: rgba(30, 27, 75, 0.9) !important;
+            border: 1px solid rgba(139, 92, 246, 0.5) !important;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+        }
+
+        .tab-active {
+            border-bottom: 2px solid #8b5cf6;
+            color: #8b5cf6;
+        }
+
+        .tab-inactive {
+            border-bottom: 2px solid transparent;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-inactive:hover {
+            color: #cbd5e1;
+            border-bottom: 2px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .code-block {
+            background: #0f172a;
+            border-left: 3px solid #8b5cf6;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-responsive {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        .pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(139, 92, 246, 0.6);
+            }
+        }
+    </style>
+</head>
+<body class="text-gray-100">
+    <!-- Navbar -->
+    <nav class="glass-card sticky top-0 z-50 backdrop-blur-xl border-b border-purple-500/20">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="text-3xl">📋</div>
+                <div>
+                    <h1 class="text-xl font-bold gradient-text">PM Assistant & API Docs</h1>
+                    <p class="text-xs text-gray-400">Powered by RK </p>
+                </div>
+            </div>
+            <div class="hidden md:flex items-center gap-2 text-sm">
+                <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-medium pulse-glow">
+                    ✓ Enterprise Ready
+                </span>
+            </div>
+        </div>
+        <button onclick="logout()" class="px-4 py-2 bg-red-500/20 text-red-400 rounded-lg text-sm hover:bg-red-500/30 ml-4">
+    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+</button>
+
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="max-w-7xl mx-auto px-4 pt-12 pb-8">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl md:text-5xl font-bold mb-4 gradient-text">
+                Generate PRDs + Auto-Document Your APIs
+            </h2>
+            <p class="text-gray-400 text-lg max-w-2xl mx-auto">
+                Create professional Product Requirements Documents and comprehensive API documentation in seconds. From idea to implementation, all enterprise-ready.
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 pb-12">
+        <!-- Tab Navigation -->
+        <div class="flex gap-4 mb-8 pb-4 border-b border-purple-500/20 overflow-x-auto">
+            <button id="prdTabBtn" class="px-6 py-3 whitespace-nowrap font-semibold tab-active flex items-center gap-2">
+                <i class="fas fa-file-alt"></i> PRD Generator
+            </button>
+            <button id="apiTabBtn" class="px-6 py-3 whitespace-nowrap font-semibold tab-inactive flex items-center gap-2">
+                <i class="fas fa-code"></i> API Doc Generator
+            </button>
+            <button id="docsTabBtn" class="px-6 py-3 whitespace-nowrap font-semibold tab-inactive flex items-center gap-2">
+                <i class="fas fa-info-circle"></i> How It Works
+            </button>
+        </div>
+
+        <!-- PRD Generator Tab -->
+        <div id="prdTab" class="grid grid-cols-1 lg:grid-cols-2 gap-6 grid-responsive">
+            <!-- Input Panel -->
+            <div class="glass-card rounded-2xl p-8 border border-purple-500/20">
+                <div class="mb-6">
+                    <h3 class="text-2xl font-bold mb-2 flex items-center gap-2">
+                        <i class="fas fa-lightbulb text-purple-400"></i> Feature Idea
+                    </h3>
+                    <p class="text-gray-400 text-sm">Describe your product feature</p>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Feature Idea -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">
+                            <i class="fas fa-star"></i> What's the feature?
+                        </label>
+                        <textarea 
+                            id="featureIdea" 
+                            class="w-full h-32 p-4 rounded-lg font-mono text-sm resize-none focus:outline-none"
+                            placeholder="e.g., Dark mode toggle for web app with automatic OS-level detection"
+                        ></textarea>
+                    </div>
+
+                    <!-- Target Audience -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">
+                            <i class="fas fa-users"></i> Target Audience
+                        </label>
+                        <input 
+                            type="text" 
+                            id="targetAudience"
+                            class="w-full px-4 py-3 rounded-lg text-sm"
+                            placeholder="e.g., Developers, Students, Enterprise users"
+                        >
+                    </div>
+
+                    <!-- Problem Statement -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">
+                            <i class="fas fa-exclamation-circle"></i> Problem Statement (Optional)
+                        </label>
+                        <textarea 
+                            id="problemStatement" 
+                            class="w-full h-24 p-4 rounded-lg font-mono text-sm resize-none focus:outline-none"
+                            placeholder="What problem does this solve?"
+                        ></textarea>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <button 
+                        id="generatePrdBtn" 
+                        class="w-full btn-primary text-white font-bold py-3 px-6 rounded-lg text-lg flex items-center justify-center gap-2"
+                    >
+                        <i class="fas fa-rocket"></i> Generate PRD
+                    </button>
+
+                    <!-- Loading -->
+                    <div id="prdLoading" class="hidden mt-4 flex items-center justify-center gap-2 text-purple-400">
+                        <i class="fas fa-spinner spinner"></i>
+                        <span>Generating PRD...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output Panel -->
+            <div class="glass-card rounded-2xl p-8 border border-purple-500/20">
+                <div class="mb-6">
+                    <h3 class="text-2xl font-bold mb-2 flex items-center gap-2">
+                        <i class="fas fa-file-alt text-pink-400"></i> PRD Output
+                    </h3>
+                    <p class="text-gray-400 text-sm">Your product requirements document</p>
+                </div>
+
+                <!-- Output Tabs -->
+                <div class="flex gap-2 mb-4 border-b border-purple-500/20 overflow-x-auto">
+                    <button id="prdDocTab" class="px-3 py-2 text-sm tab-active whitespace-nowrap">
+                        📄 PRD
+                    </button>
+                    <button id="storiesTab" class="px-3 py-2 text-sm tab-inactive whitespace-nowrap">
+                        👤 User Stories
+                    </button>
+                    <button id="metricsTab" class="px-3 py-2 text-sm tab-inactive whitespace-nowrap">
+                        📊 Metrics
+                    </button>
+                </div>
+
+                <!-- PRD Output -->
+                <div id="prdDocOutput" class="bg-gray-900/50 rounded-lg p-4 max-h-96 overflow-y-auto code-block">
+                    <p class="text-gray-500 text-center py-8">
+                        <i class="fas fa-arrow-up"></i> Click "Generate PRD" to get started
+                    </p>
+                </div>
+
+                <!-- Stories Output -->
+                <div id="storiesOutput" class="hidden bg-gray-900/50 rounded-lg p-4 max-h-96 overflow-y-auto">
+                    <ul id="storiesList" class="space-y-2 text-sm text-gray-300"></ul>
+                </div>
+
+                <!-- Metrics Output -->
+                <div id="metricsOutput" class="hidden bg-gray-900/50 rounded-lg p-4 max-h-96 overflow-y-auto">
+                    <div class="space-y-3">
+                        <div class="mb-4 p-3 bg-purple-500/10 rounded-lg border border-purple-500/20">
+                            <div class="text-sm font-semibold text-purple-400 mb-1">Timeline:</div>
+                            <div id="timelineOutput" class="text-gray-300"></div>
+                        </div>
+                        <div>
+                            <div class="text-sm font-semibold text-green-400 mb-2">Success Metrics:</div>
+                            <ul id="metricsList" class="space-y-1 text-sm text-gray-300"></ul>
+                        </div>
+                        <div class="mt-3">
+                            <div class="text-sm font-semibold text-orange-400 mb-2">Risks:</div>
+                            <ul id="risksList" class="space-y-1 text-sm text-gray-300"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Copy Button -->
+                <button id="copyPrdBtn" class="hidden w-full mt-4 bg-gray-700/50 hover:bg-gray-600/50 text-white font-medium py-2 px-4 rounded-lg transition-all">
+                    <i class="fas fa-copy"></i> Copy PRD
+                </button>
+            </div>
+        </div>
+
+        <!-- API Doc Generator Tab -->
+        <div id="apiTab" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6 grid-responsive">
+            <!-- Input Panel -->
+            <div class="glass-card rounded-2xl p-8 border border-purple-500/20">
+                <div class="mb-6">
+                    <h3 class="text-2xl font-bold mb-2 flex items-center gap-2">
+                        <i class="fas fa-code text-purple-400"></i> Your API Code
+                    </h3>
+                    <p class="text-gray-400 text-sm">Paste your API code for documentation</p>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Project Name -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">
+                            <i class="fas fa-project-diagram"></i> Project Name
+                        </label>
+                        <input 
+                            type="text" 
+                            id="apiProjectName"
+                            class="w-full px-4 py-3 rounded-lg text-sm"
+                            placeholder="My API Service"
+                        >
+                    </div>
+
+                    <!-- Language -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">
+                            <i class="fas fa-code"></i> Language
+                        </label>
+                        <select id="apiLanguage" class="w-full px-4 py-3 rounded-lg text-sm">
+                            <option value="python">🐍 Python (FastAPI/Flask)</option>
+                            <option value="javascript">🟨 JavaScript (Express/Node)</option>
+                            <option value="go">🐹 Go</option>
+                            <option value="java">☕ Java</option>
+                        </select>
+                    </div>
+
+                    <!-- Code Input -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">
+                            <i class="fas fa-file-code"></i> API Code
+                        </label>
+                        <textarea 
+                            id="apiCode" 
+                            class="w-full h-56 p-4 rounded-lg font-mono text-sm resize-none focus:outline-none"
+                            placeholder="Paste your API code here..."
+                        ></textarea>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <button 
+                        id="generateApiBtn" 
+                        class="w-full btn-secondary text-white font-bold py-3 px-6 rounded-lg text-lg flex items-center justify-center gap-2"
+                    >
+                        <i class="fas fa-file-alt"></i> Generate Docs
+                    </button>
+
+                    <!-- Loading -->
+                    <div id="apiLoading" class="hidden mt-4 flex items-center justify-center gap-2 text-green-400">
+                        <i class="fas fa-spinner spinner"></i>
+                        <span>Generating documentation...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output Panel -->
+            <div class="glass-card rounded-2xl p-8 border border-purple-500/20">
+                <div class="mb-6">
+                    <h3 class="text-2xl font-bold mb-2 flex items-center gap-2">
+                        <i class="fas fa-book text-pink-400"></i> Documentation
+                    </h3>
+                    <p class="text-gray-400 text-sm">Professional API documentation</p>
+                </div>
+
+                <!-- Doc Tabs -->
+                <div class="flex gap-2 mb-4 border-b border-purple-500/20 overflow-x-auto">
+                    <button id="markdownTab" class="px-3 py-2 text-sm tab-active whitespace-nowrap">
+                        📖 Markdown
+                    </button>
+                    <button id="openAPITab" class="px-3 py-2 text-sm tab-inactive whitespace-nowrap">
+                        🔗 OpenAPI
+                    </button>
+                    <button id="examplesTab" class="px-3 py-2 text-sm tab-inactive whitespace-nowrap">
+                        💻 Examples
+                    </button>
+                </div>
+
+                <!-- Markdown Output -->
+                <div id="markdownOutput" class="bg-gray-900/50 rounded-lg p-4 max-h-96 overflow-y-auto prose prose-invert max-w-none">
+                    <p class="text-gray-500 text-center py-8">
+                        <i class="fas fa-arrow-up"></i> Click "Generate Docs" to get started
+                    </p>
+                </div>
+
+                <!-- OpenAPI Output -->
+                <div id="openAPIOutput" class="hidden bg-gray-900/50 rounded-lg p-4 max-h-96 overflow-y-auto code-block">
+                    <pre id="openAPICode" class="text-xs text-gray-300"></pre>
+                </div>
+
+                <!-- Examples Output -->
+                <div id="examplesOutput" class="hidden bg-gray-900/50 rounded-lg p-4 max-h-96 overflow-y-auto">
+                    <div id="examplesList"></div>
+                </div>
+
+                <!-- Copy Button -->
+                <button id="copyApiBtn" class="hidden w-full mt-4 bg-gray-700/50 hover:bg-gray-600/50 text-white font-medium py-2 px-4 rounded-lg transition-all">
+                    <i class="fas fa-copy"></i> Copy Documentation
+                </button>
+            </div>
+        </div>
+
+        <!-- How It Works Tab -->
+        <div id="docsTab" class="hidden glass-card rounded-2xl p-8 border border-purple-500/20">
+            <h3 class="text-2xl font-bold mb-6 gradient-text">How It Works</h3>
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- PRD Generator -->
+                <div class="space-y-4">
+                    <h4 class="text-xl font-bold text-purple-400 mb-4">📋 PRD Generator</h4>
+                    <div class="flex gap-4">
+                        <div class="text-3xl">1️⃣</div>
+                        <div>
+                            <h5 class="font-bold mb-1">Describe Feature</h5>
+                            <p class="text-gray-400 text-sm">Enter your feature idea, target audience, and problem statement</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="text-3xl">2️⃣</div>
+                        <div>
+                            <h5 class="font-bold mb-1">Generate PRD</h5>
+                            <p class="text-gray-400 text-sm">AI creates a comprehensive PRD with user stories, metrics, timeline, and risks</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="text-3xl">3️⃣</div>
+                        <div>
+                            <h5 class="font-bold mb-1">Share with Team</h5>
+                            <p class="text-gray-400 text-sm">Copy and share with stakeholders, engineering teams, and designers</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API Doc Generator -->
+                <div class="space-y-4">
+                    <h4 class="text-xl font-bold text-pink-400 mb-4">📚 API Doc Generator</h4>
+                    <div class="flex gap-4">
+                        <div class="text-3xl">1️⃣</div>
+                        <div>
+                            <h5 class="font-bold mb-1">Paste API Code</h5>
+                            <p class="text-gray-400 text-sm">Select language and paste your API endpoint code</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="text-3xl">2️⃣</div>
+                        <div>
+                            <h5 class="font-bold mb-1">Auto-Generate Docs</h5>
+                            <p class="text-gray-400 text-sm">AI creates Markdown docs, OpenAPI specs, and code examples</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="text-3xl">3️⃣</div>
+                        <div>
+                            <h5 class="font-bold mb-1">Export & Use</h5>
+                            <p class="text-gray-400 text-sm">Copy documentation for Confluence, Notion, or your developer portal</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="glass-card border-t border-purple-500/20 mt-12 py-8 text-center text-gray-400 text-sm">
+        <p>Built with <span class="text-pink-400"></span> using Groq + Llama 3.3 | Enterprise-Ready PM Tools</p>
+    </footer>
+
+    <script>
+        // ========== LOGIN CHECK (ADD THIS AT TOP) ==========
+if (localStorage.getItem('isLoggedIn') !== 'true') {
+    window.location.href = '/';
+}
+
+function logout() {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('user');
+    window.location.href = '/';
+}
+// ================================================
+
+        const API_URL = 'http://localhost:8002';
+        let currentPrd = null;
+        let currentApiDoc = null;
+
+        // Tab switching
+        document.getElementById('prdTabBtn').addEventListener('click', () => switchTab('prd'));
+        document.getElementById('apiTabBtn').addEventListener('click', () => switchTab('api'));
+        document.getElementById('docsTabBtn').addEventListener('click', () => switchTab('docs'));
+
+        function switchTab(tab) {
+            document.querySelectorAll('[id$="Tab"]').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('[id$="TabBtn"]').forEach(btn => {
+                btn.classList.remove('tab-active');
+                btn.classList.add('tab-inactive');
+            });
+
+            if (tab === 'prd') {
+                document.getElementById('prdTab').classList.remove('hidden');
+                document.getElementById('prdTabBtn').classList.add('tab-active');
+                document.getElementById('prdTabBtn').classList.remove('tab-inactive');
+            } else if (tab === 'api') {
+                document.getElementById('apiTab').classList.remove('hidden');
+                document.getElementById('apiTabBtn').classList.add('tab-active');
+                document.getElementById('apiTabBtn').classList.remove('tab-inactive');
+            } else if (tab === 'docs') {
+                document.getElementById('docsTab').classList.remove('hidden');
+                document.getElementById('docsTabBtn').classList.add('tab-active');
+                document.getElementById('docsTabBtn').classList.remove('tab-inactive');
+            }
+        }
+
+        // Generate PRD
+        document.getElementById('generatePrdBtn').addEventListener('click', async () => {
+            const idea = document.getElementById('featureIdea').value.trim();
+            const audience = document.getElementById('targetAudience').value.trim();
+            const problem = document.getElementById('problemStatement').value.trim();
+
+            if (!idea || !audience) {
+                alert('Please fill in feature idea and target audience!');
+                return;
+            }
+
+            document.getElementById('prdLoading').classList.remove('hidden');
+            document.getElementById('generatePrdBtn').disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/api/generate-prd`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        feature_idea: idea,
+                        target_audience: audience,
+                        problem_statement: problem
+                    })
+                });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+
+                currentPrd = data;
+
+                document.getElementById('prdDocOutput').innerHTML = `<pre class="text-sm text-gray-300 whitespace-pre-wrap">${data.prd_document}</pre>`;
+                document.getElementById('storiesList').innerHTML = data.user_stories.map(s => `<li class="p-2 bg-purple-500/10 rounded border border-purple-500/20">✓ ${s}</li>`).join('');
+                document.getElementById('timelineOutput').textContent = data.timeline;
+                document.getElementById('metricsList').innerHTML = data.success_metrics.map(m => `<li>✓ ${m}</li>`).join('');
+                document.getElementById('risksList').innerHTML = data.risks.map(r => `<li>⚠️ ${r}</li>`).join('');
+
+                document.getElementById('copyPrdBtn').classList.remove('hidden');
+                document.getElementById('copyPrdBtn').onclick = () => {
+                    navigator.clipboard.writeText(data.prd_document);
+                    document.getElementById('copyPrdBtn').innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    setTimeout(() => { document.getElementById('copyPrdBtn').innerHTML = '<i class="fas fa-copy"></i> Copy PRD'; }, 2000);
+                };
+
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            } finally {
+                document.getElementById('prdLoading').classList.add('hidden');
+                document.getElementById('generatePrdBtn').disabled = false;
+            }
+        });
+
+        // Generate API Docs
+        document.getElementById('generateApiBtn').addEventListener('click', async () => {
+            const code = document.getElementById('apiCode').value.trim();
+            const name = document.getElementById('apiProjectName').value.trim() || 'API';
+            const lang = document.getElementById('apiLanguage').value;
+
+            if (!code) {
+                alert('Please enter your API code!');
+                return;
+            }
+
+            document.getElementById('apiLoading').classList.remove('hidden');
+            document.getElementById('generateApiBtn').disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/api/generate-api-docs`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        code: code,
+                        language: lang,
+                        project_name: name
+                    })
+                });
+
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+
+                currentApiDoc = data;
+
+                document.getElementById('markdownOutput').innerHTML = marked.parse(data.markdown_docs);
+                document.getElementById('openAPICode').textContent = data.openapi_spec;
+
+                let examplesHtml = '';
+                data.code_examples.forEach(ex => {
+                    examplesHtml += `<div class="mb-4"><h4 class="text-green-400 font-bold mb-2">${ex.language}</h4><pre class="bg-black rounded p-2 text-xs text-gray-300 overflow-x-auto"><code>${ex.code}</code></pre></div>`;
+                });
+                document.getElementById('examplesList').innerHTML = examplesHtml;
+
+                document.getElementById('copyApiBtn').classList.remove('hidden');
+                document.getElementById('copyApiBtn').onclick = () => {
+                    navigator.clipboard.writeText(JSON.stringify(currentApiDoc, null, 2));
+                    document.getElementById('copyApiBtn').innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    setTimeout(() => { document.getElementById('copyApiBtn').innerHTML = '<i class="fas fa-copy"></i> Copy Documentation'; }, 2000);
+                };
+
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            } finally {
+                document.getElementById('apiLoading').classList.add('hidden');
+                document.getElementById('generateApiBtn').disabled = false;
+            }
+        });
+
+        // PRD Output tabs
+        document.getElementById('prdDocTab').addEventListener('click', () => switchPrdTab('doc'));
+        document.getElementById('storiesTab').addEventListener('click', () => switchPrdTab('stories'));
+        document.getElementById('metricsTab').addEventListener('click', () => switchPrdTab('metrics'));
+
+        function switchPrdTab(tab) {
+            document.getElementById('prdDocOutput').classList.add('hidden');
+            document.getElementById('storiesOutput').classList.add('hidden');
+            document.getElementById('metricsOutput').classList.add('hidden');
+
+            document.getElementById('prdDocTab').classList.remove('tab-active');
+            document.getElementById('prdDocTab').classList.add('tab-inactive');
+            document.getElementById('storiesTab').classList.remove('tab-active');
+            document.getElementById('storiesTab').classList.add('tab-inactive');
+            document.getElementById('metricsTab').classList.remove('tab-active');
+            document.getElementById('metricsTab').classList.add('tab-inactive');
+
+            if (tab === 'doc') {
+                document.getElementById('prdDocOutput').classList.remove('hidden');
+                document.getElementById('prdDocTab').classList.add('tab-active');
+                document.getElementById('prdDocTab').classList.remove('tab-inactive');
+            } else if (tab === 'stories') {
+                document.getElementById('storiesOutput').classList.remove('hidden');
+                document.getElementById('storiesTab').classList.add('tab-active');
+                document.getElementById('storiesTab').classList.remove('tab-inactive');
+            } else if (tab === 'metrics') {
+                document.getElementById('metricsOutput').classList.remove('hidden');
+                document.getElementById('metricsTab').classList.add('tab-active');
+                document.getElementById('metricsTab').classList.remove('tab-inactive');
+            }
+        }
+
+        // API Doc tabs
+        document.getElementById('markdownTab').addEventListener('click', () => switchApiTab('markdown'));
+        document.getElementById('openAPITab').addEventListener('click', () => switchApiTab('openapi'));
+        document.getElementById('examplesTab').addEventListener('click', () => switchApiTab('examples'));
+
+        function switchApiTab(tab) {
+            document.getElementById('markdownOutput').classList.add('hidden');
+            document.getElementById('openAPIOutput').classList.add('hidden');
+            document.getElementById('examplesOutput').classList.add('hidden');
+
+            document.getElementById('markdownTab').classList.remove('tab-active');
+            document.getElementById('markdownTab').classList.add('tab-inactive');
+            document.getElementById('openAPITab').classList.remove('tab-active');
+            document.getElementById('openAPITab').classList.add('tab-inactive');
+            document.getElementById('examplesTab').classList.remove('tab-active');
+            document.getElementById('examplesTab').classList.add('tab-inactive');
+
+            if (tab === 'markdown') {
+                document.getElementById('markdownOutput').classList.remove('hidden');
+                document.getElementById('markdownTab').classList.add('tab-active');
+                document.getElementById('markdownTab').classList.remove('tab-inactive');
+            } else if (tab === 'openapi') {
+                document.getElementById('openAPIOutput').classList.remove('hidden');
+                document.getElementById('openAPITab').classList.add('tab-active');
+                document.getElementById('openAPITab').classList.remove('tab-inactive');
+            } else if (tab === 'examples') {
+                document.getElementById('examplesOutput').classList.remove('hidden');
+                document.getElementById('examplesTab').classList.add('tab-active');
+                document.getElementById('examplesTab').classList.remove('tab-inactive');
+            }
+        }
+    </script>
+</body>
+</html>
